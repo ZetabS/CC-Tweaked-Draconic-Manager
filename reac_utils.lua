@@ -620,6 +620,10 @@ function Controller:setTrip(actions, reason, restartable)
     emit(actions, "CRIT", "TRIP: " .. reason .. " - stopping reactor")
 end
 
+local function shutdownOutput(input, config)
+    return clamp(math.ceil(input * 1.2), 0, config.maxOutflow)
+end
+
 --[[
 One control cycle. `info` comes from reac_utils.readInfo (nil when the
 reactor could not be read). `now` is a monotonic time in seconds.
@@ -692,7 +696,7 @@ function Controller:step(info, now)
     if status == "running" then
         actions.input = self:fieldInput(info, dt)
         if stopNow or self.desired == "stop" then
-            actions.output = 0
+            actions.output = shutdownOutput(actions.input, c)
             if self:commandReady("stop", now) or stopNow then
                 actions.command = "stop"
             end
@@ -704,7 +708,7 @@ function Controller:step(info, now)
 
     elseif status == "stopping" then
         actions.input = self:fieldInput(info, dt)
-        actions.output = 0
+        actions.output = shutdownOutput(actions.input, c)
         -- Draconic Evolution lets a stopping reactor be re-activated while
         -- it is above 2000C, so a trip need not wait for a full cooldown
         -- and recharge: resume once it has cooled to safeTemperature and
