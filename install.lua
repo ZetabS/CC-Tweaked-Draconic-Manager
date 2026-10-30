@@ -19,7 +19,7 @@ that disable it, use offline_install.lua instead.
 
 local args = {...}
 local branch = args[1] or "main"
-local repoBase = "https://raw.githubusercontent.com/owzo/CC-Tweaked-Draconic-Manager/"
+local repoBase = "https://raw.githubusercontent.com/ZetabS/CC-Tweaked-Draconic-Manager/"
     .. branch .. "/"
 
 local files = {
